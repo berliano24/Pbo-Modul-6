@@ -1,5 +1,9 @@
 package models;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tugas.Encryptor;
 
 public class PasswordStore {
@@ -12,37 +16,66 @@ public class PasswordStore {
     public static final int CAT_MOBILEAPP = 2;
     public static final int CAT_OTHER = 3;
 
+    public static final String[] CATEGORIES = { "Belum terkategori", "Aplikasi Web", "Aplikasi Mobile",
+            "Akun Lainnya" };
+
+    public PasswordStore(String name, String username, String plainPass) {
+        this(name, username, plainPass, UNCATEGORIZED);
+    }
+
     public PasswordStore(String name, String username, String plainPass, int category) {
         try {
             this.hashkey = Encryptor.generateKey();
-            this.name = name;
-            this.username = username;
-            setPassword(plainPass);
-            setCategory(category);
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(PasswordStore.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        this.name = name;
+        this.username = username;
+        this.setPassword(plainPass);
+        this.setCategory(category);
     }
-    public PasswordStore(String name, String username, String plainPass) {
+
+    public PasswordStore(String name, String username, String encPass,
+            int category, String hashKey, double score) {
+        this.name = name;
+        this.username = username;
+        this.password = encPass;
+        this.category = category;
+        this.hashkey = hashKey;
+        this.score = score;
+    }
+
+    public void setEncryptedPass(String encryptedPass, String hashkey) {
+        this.password = encryptedPass;
+        this.hashkey = hashkey;
+    }
+
+    public void setHashkey(String hashkey) {
         try {
-            this.hashkey = Encryptor.generateKey();
-            this.name = name;
-            this.username = username;
-            setPassword(plainPass);
-            setCategory(UNCATEGORIZED);
+            this.hashkey = hashkey;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    public String getHashkey() {
+        return this.hashkey;
     }
 
     public void setPassword(String plainPass) {
+        String encryptedPass;
         try {
-            this.password = Encryptor.encrypt(plainPass, this.hashkey);
-            calculateScore(plainPass);
-        } catch (Exception e) {
-            e.printStackTrace();
+            encryptedPass = Encryptor.encrypt(plainPass, this.hashkey);
+            this.password = encryptedPass;
+            this.calculateScore(plainPass);
+        } catch (Exception ex) {
+            Logger.getLogger(PasswordStore.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public String getEncPassword() {
+        return this.password;
     }
 
     public String getPassword() {
@@ -63,30 +96,29 @@ public class PasswordStore {
     }
 
     public String getCategory() {
-        switch (this.category) {
-            case 0:
-                return "Belum terkategori";
-            case 1:
-                return "Aplikasi web";
-            case 2:
-                return "Aplikasi mobile";
-            case 3:
-                return "Akun lainnya";
-            default:
-                return "Belum terkategori";
-        }
+        return CATEGORIES[this.category];
     }
+
+    public int getCategoryCode() {
+        return this.category;
+    }
+
+    public double getScore() {
+        return this.score;
+    }
+
     private void calculateScore(String plainPass) {
-        if (plainPass.length() > 15) {
+        double len = plainPass.length();
+        if (len > 15) {
             this.score = 10;
         } else {
-            this.score = (plainPass.length() / 15.0) * 10;
+            this.score = (len / 15) * 10;
         }
     }
 
     @Override
     public String toString() {
-        return "Username: " + this.username + "\nPassword (encrypted): " + this.password + "\nHashkey: " + this.hashkey
-                + "\nKategori: " + this.getCategory() + "\nScore: " + this.score;
+        return this.username + " - " + this.password + " - " + this.hashkey + " - "
+                + String.format("%,.2f", this.score);
     }
 }

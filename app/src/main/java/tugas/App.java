@@ -3,6 +3,7 @@
  */
 package tugas;
 
+import models.DataPassword;
 import models.PasswordStore;
 
 public class App {
@@ -12,10 +13,15 @@ public class App {
 
     public static void main(String[] args) {
           try {
-            PasswordStore pass1 = new PasswordStore("Akun BCA", "1122334455", "RahasiaNegara");
-            pass1.setCategory(PasswordStore.CAT_WEBAPP);
-            System.out.println(pass1);
-            System.out.println("USERNAME: " + pass1.username + " PASSWORD: " + pass1.getPassword());
+            DataPassword.loadCSVData();
+            MainPage mainPage = new MainPage(80);
+            mainPage.draw();
+
+            // Your application logic here (e.g., password input, display)
+            // Use DataPassword.passData to manage password data
+
+            // Save password data on exit (before exiting the application)
+            DataPassword.saveCSVData();
         } catch (Exception e) {
             e.printStackTrace();
         }
