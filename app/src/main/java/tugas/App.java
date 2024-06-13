@@ -3,8 +3,17 @@
  */
 package tugas;
 
-import models.DataPassword;
-import models.PasswordStore;
+import java.util.*;
+
+import tugas.database.DBset;
+import tugas.entities.Folder;
+import tugas.entities.PasswordStores;
+import tugas.entities.UserData;
+import tugas.models.DataPassword;
+import tugas.models.FolderDaoSQLite;
+import tugas.models.PasswordStore;
+import tugas.models.PasswordStoreDaoSQLite;
+import tugas.models.UserDaoSQLite;
 
 public class App {
     public String getGreeting() {
@@ -13,15 +22,57 @@ public class App {
 
     public static void main(String[] args) {
           try {
-            DataPassword.loadCSVData();
-            MainPage mainPage = new MainPage(80);
-            mainPage.draw();
+             DBset.createTable();
 
-            // Your application logic here (e.g., password input, display)
-            // Use DataPassword.passData to manage password data
+                        UserDaoSQLite userDao = new UserDaoSQLite();
+                        FolderDaoSQLite folderDao = new FolderDaoSQLite();
+                        PasswordStoreDaoSQLite passwordStoreDao = new PasswordStoreDaoSQLite();
 
-            // Save password data on exit (before exiting the application)
-            DataPassword.saveCSVData();
+                        // Add 2 users
+                        int user1Id = userDao.register("user1", "password1", "User One");
+                        int user2Id = userDao.register("user2", "password2", "User Two");
+
+                        // Add 4 folders
+                        folderDao.createFolder("Folder 1");
+                        folderDao.createFolder("Folder 2");
+                        folderDao.createFolder("Folder 3");
+                        folderDao.createFolder("Folder 4");
+
+                        ArrayList<Folder> folders = folderDao.listAllFolders();
+
+                        // Get user data for user1
+                        UserData user1 = userDao.login("user1", "password1");
+
+                        // Add 5 passwords for user1
+                        passwordStoreDao.addPassword(new PasswordStores("Account 1", "username1", "password1",
+                                        PasswordStores.CAT_WEBAPP, folders.get(0)), user1);
+                        passwordStoreDao.addPassword(new PasswordStores("Account 2", "username2", "password2",
+                                        PasswordStores.CAT_MOBILEAPP, folders.get(1)), user1);
+                        passwordStoreDao.addPassword(new PasswordStores("Account 3", "username3", "password3",
+                                        PasswordStores.CAT_OTHER, folders.get(2)), user1);
+                        passwordStoreDao.addPassword(new PasswordStores("Account 4", "username4", "password4",
+                                        PasswordStores.UNCATEGORIZED, folders.get(3)), user1);
+                        passwordStoreDao.addPassword(new PasswordStores("Account 5", "username5", "password5",
+                                        PasswordStores.CAT_WEBAPP, null), user1);
+                        ArrayList<PasswordStores> userPasswords = passwordStoreDao.listPassword(user1);
+                        System.out.println("Password data for " + user1.fullname + ":");
+                        for (PasswordStores password : userPasswords) {
+                                System.out.println("Account Name: " + password.name);
+                                System.out.println("Username: " + password.username);
+                                System.out.println("Category: " + password.getCategory());
+                                System.out.println("Folder: "
+                                                + (password.folder != null ? password.folder.name : "No folder"));
+                                System.out.println();
+                        }
+            // DataPassword.loadCSVData();
+            // MainPage mainPage = new MainPage(80);
+            // mainPage.draw();
+
+            // // Your application logic here (e.g., password input, display)
+            // // Use DataPassword.passData to manage password data
+
+            // // Save password data on exit (before exiting the application)
+            // DataPassword.saveCSVData();
         } catch (Exception e) {
             e.printStackTrace();
         }

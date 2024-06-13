@@ -2,9 +2,8 @@ package tugas;
 
 import java.util.ArrayList;
 
-
-import models.DataPassword;
-import models.PasswordStore;
+import tugas.models.DataPassword;
+import tugas.models.PasswordStore;
 
 public class ListPasswordPage extends BasePage {
     public String title;

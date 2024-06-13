@@ -1,4 +1,4 @@
-package models;
+package tugas.models;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;

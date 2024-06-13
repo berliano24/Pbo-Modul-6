@@ -2,9 +2,8 @@ package tugas;
 
 import java.util.Scanner;
 
-
-import models.DataPassword;
-import models.PasswordStore;
+import tugas.models.DataPassword;
+import tugas.models.PasswordStore;
 
 public class InputPage extends BasePage {
     Input inputName = new Input("Judul Password");

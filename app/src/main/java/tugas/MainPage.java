@@ -1,6 +1,6 @@
 package tugas;
 
-import models.DataPassword;
+import tugas.models.DataPassword;
 
 public class MainPage extends BasePage {
     SelectInput pageSelect;

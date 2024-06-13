@@ -1,4 +1,4 @@
-package models;
+package tugas.models;
 
 import java.io.FileWriter;
 import java.io.*;
